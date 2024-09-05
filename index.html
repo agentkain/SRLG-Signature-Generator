@@ -137,6 +137,17 @@
                 padding-top: 10px !important;
             }
         }
+
+        .active {
+            background-color: #b29649; /* Highlight color for active button */
+            color: white;
+        }
+        .disabled {
+            background-color: #f0f0f0; /* Grey out color for disabled fields */
+            color: #aaa; /* Light text color */
+            pointer-events: none; /* Disable interaction */
+        }
+        
     </style>
 </head>
 <body>
@@ -337,8 +348,6 @@
               </tr>
             </table>
             `;
-
-            document.getElementById('signature-output').innerHTML = signatureTemplate;
         }
 
         function copySignature() {
