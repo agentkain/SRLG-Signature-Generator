@@ -143,28 +143,17 @@
         /* For mobile devices */
         @media (max-width: 600px) {
             body {
-                font-size: 8px;
+                font-size: 9px;
             }
             #signature-form {
                 grid-template-columns: 1fr; /* Single column on small screens */
             }
-            .contact-info {
-                font-size: 9pt; /* Slightly smaller font */
-            }
-            .contact-info div {
-                padding-left: 0 !important; /* Remove left padding on mobile */
-                white-space: nowrap; /* Keep icon and text together */
-                overflow: hidden;
-                text-overflow: ellipsis; /* Add ellipsis if text overflows */
-            }
-            .contact-info a {
-                word-break: break-all; /* Allow breaking within email address */
-            }
             .signature-table {
                 width: 100% !important;
+                max-width: 100% !important;
             }
             .logo img {
-                width: 150px !important; /* Smaller logo */
+                width: 100px !important; /* Further reduce logo size */
                 height: auto !important;
             }
             .logo-cell, .content-cell {
@@ -173,6 +162,19 @@
             }
             .content-cell {
                 padding-top: 10px !important;
+                padding-left: 10px !important; /* Add some space between logo and text */
+            }
+            .contact-info {
+                font-size: 11pt !important; /* Adjust font size for better fit */
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+            .contact-info div {
+                padding-left: 0 !important; /* Remove left padding on mobile */
+            }
+            .contact-info a {
+                word-break: break-all !important; /* Allow email to break if needed */
             }
             input[type="text"],
             input[type="email"],
@@ -389,6 +391,10 @@ function validatePronouns(input) {
     }
 }
 
+function capitalizeWords(input) {
+    return input.replace(/\b\w/g, function(l) { return l.toUpperCase() });
+}
+
 function generateEmail() {
     if (currentMode === 'regular') {
         const nameInput = document.getElementById('name');
@@ -477,7 +483,7 @@ function generateSignature() {
     const name = document.getElementById('name').value.trim();
     let email = currentMode === 'intake' ? 'intake@saddlerocklegal.com' : document.getElementById('email').value.trim();
     const pronouns = document.getElementById('pronouns').value.trim(); // Remove the mode check
-    const title = currentMode === 'intake' ? 'Intake Specialist' : document.getElementById('title').value.trim();
+    const title = currentMode === 'intake' ? 'Intake Specialist' : capitalizeWords(document.getElementById('title').value.trim());
     const phone = currentMode === 'intake' ? '(888) 686-6454' : document.getElementById('phone').value.trim();
     const extension = currentMode === 'regular' ? document.getElementById('extension').value.trim() : '';
     const mobile = currentMode === 'regular' ? document.getElementById('mobile').value.trim() : '';
@@ -564,48 +570,46 @@ function generateSignature() {
 
 
 
-    const signatureTemplate = `
-    <table border="0" cellspacing="0" cellpadding="0" width="100%" style="max-width: 500px;" class="signature-table">
-      <tr>
-        <td style="padding: 0;">
-          <table border="0" cellspacing="0" cellpadding="0" width="100%">
-            <tr>
-              <td width="${allElementsPresent ? '190' : '180'}" class="logo-cell" valign="top" style="padding-right: 0;">
-                <div style="display: flex; align-items: flex-start;">
-                  <a href="https://www.saddlerocklegal.com/" target="_blank">
-                    <img src="https://i.imgur.com/zZGyoQQ.png" width="${allElementsPresent ? '190' : '180'}" style="width:${allElementsPresent ? '190px' : '180px'}; ${allElementsPresent ? 'height:110px;' : 'max-width:100%; height:auto;'} border:none;" alt="Saddle Rock Legal Logo" id="logo-img" />
-                  </a>
-                </div>
-              </td>
-              <td class="content-cell" valign="top" style="padding-left: 0;">
-                <table border="0" cellspacing="0" cellpadding="0" width="100%" id="content-table" style="padding-top: ${tablePadding};">
-                  <tr>
-                    <td style="font-family:Arial, sans-serif; font-size:12pt; font-weight:bold; padding-bottom:1px; line-height:1.2;">
-                      ${name}${pronouns ? ` <span style="font-weight:normal; font-size:10pt;">(${pronouns})</span>` : ''}
-                    </td>
-                  </tr>
-                  ${title ? `<tr><td style="font-family:Arial, sans-serif; font-size:10pt; font-style:italic; padding-bottom:3px; line-height:1.2;">${title}</td></tr>` : ''}
-                  <tr>
-                    <td class="contact-info" style="font-family:Arial, sans-serif; font-size:10pt; line-height:1.3;">
-                      ${phone ? `<div style="padding-left:${phonePadding};"><img src="https://i.imgur.com/FlCMsqL.png" width="11" height="11" style="vertical-align:middle; margin-right:5px;" alt="Phone" />${phone}${extension ? ' EXT. ' + extension : ''}</div>` : ''}
-                      ${mobile ? `<div style="padding-left:${mobilePadding};"><img src="https://i.imgur.com/fmRyFcr.png" width="9" height="11" style="vertical-align:middle; margin-right:5px;" alt="Mobile" />${mobile}</div>` : ''}
-                      <div style="padding-left:${emailPadding};"><img src="https://i.imgur.com/Lq3De8u.png" width="13" height="10" style="vertical-align:middle; margin-right:5px;" alt="Email" /><a href="mailto:${email}" style="color:#b29649; text-decoration:none;">${email}</a></div>
-                      <div style="padding-left:${websitePadding};"><img src="https://i.imgur.com/FSfP548.png" width="11" height="11" style="vertical-align:middle; margin-right:5px;" alt="Website" /><a href="https://www.saddlerocklegal.com/" target="_blank" style="color:#b29649; text-decoration:none;">www.saddlerocklegal.com</a></div>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td style="font-family:Arial, sans-serif; font-size:7.5pt; line-height:1.2; color:#666666; padding-top:5px;">
-          This message is intended only for the use of the Addressee and may contain information that is PRIVILEGED and CONFIDENTIAL. If you are not the intended recipient, you are hereby notified that any dissemination of this communication is strictly prohibited. If you have received this email in error, please erase all copies of the message and its attachments and notify us immediately. Your receipt of this email in no way creates an attorney-client privilege as such will be done by formal written agreement between you and Saddle Rock Legal Group LLC., or referring co-counsel, if applicable.
-        </td>
-      </tr>
-    </table>
-    `;
+const signatureTemplate = `
+<table border="0" cellspacing="0" cellpadding="0" style="width:100%; max-width:500px; font-family:Arial, sans-serif;" class="signature-table">
+  <tr>
+    <td style="padding:0;">
+      <table border="0" cellspacing="0" cellpadding="0" style="width:100%;">
+        <tr>
+          <td width="${allElementsPresent ? '190' : '180'}" valign="top" style="padding-right:0px;" class="logo-cell">
+            <a href="https://www.saddlerocklegal.com/" target="_blank" style="display:block; width:${allElementsPresent ? '190px' : '180px'};">
+              <img src="https://i.imgur.com/zZGyoQQ.png" width="${allElementsPresent ? '190' : '180'}" alt="Saddle Rock Legal Logo" style="display:block; width:${allElementsPresent ? '190px' : '180px'}; max-width:100%; height:auto; border:none;" />
+            </a>
+          </td>
+          <td valign="top" style="padding-left:0;" class="content-cell">
+            <table border="0" cellspacing="0" cellpadding="0" style="width:100%; padding-top:${tablePadding};">
+              <tr>
+                <td style="font-size:12pt; font-weight:bold; padding-bottom:1px; line-height:1.2;">
+                  ${name}${pronouns ? ` <span style="font-weight:normal; font-size:10pt;">(${pronouns})</span>` : ''}
+                </td>
+              </tr>
+              ${title ? `<tr><td style="font-size:10pt; font-style:italic; padding-bottom:3px; line-height:1.2;">${title}</td></tr>` : ''}
+              <tr>
+                <td style="font-size:10pt; line-height:1.3;">
+                  ${phone ? `<div style="padding-left:${phonePadding}; margin-bottom:2px;"><img src="https://i.imgur.com/FlCMsqL.png" width="11" height="11" style="vertical-align:middle; margin-right:5px;" alt="Phone" />${phone}${extension ? ' EXT. ' + extension : ''}</div>` : ''}
+                  ${mobile ? `<div style="padding-left:${mobilePadding}; margin-bottom:2px;"><img src="https://i.imgur.com/fmRyFcr.png" width="9" height="11" style="vertical-align:middle; margin-right:5px;" alt="Mobile" />${mobile}</div>` : ''}
+                  <div style="padding-left:${emailPadding}; margin-bottom:2px;"><img src="https://i.imgur.com/Lq3De8u.png" width="13" height="10" style="vertical-align:middle; margin-right:5px;" alt="Email" /><a href="mailto:${email}" style="color:#b29649; text-decoration:none;">${email}</a></div>
+                  <div style="padding-left:${websitePadding};"><img src="https://i.imgur.com/FSfP548.png" width="11" height="11" style="vertical-align:middle; margin-right:5px;" alt="Website" /><a href="https://www.saddlerocklegal.com/" target="_blank" style="color:#b29649; text-decoration:none;">www.saddlerocklegal.com</a></div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="font-size:7.5pt; line-height:1.2; color:#666666; padding-top:5px;">
+      This message is intended only for the use of the Addressee and may contain information that is PRIVILEGED and CONFIDENTIAL. If you are not the intended recipient, you are hereby notified that any dissemination of this communication is strictly prohibited. If you have received this email in error, please erase all copies of the message and its attachments and notify us immediately. Your receipt of this email in no way creates an attorney-client privilege as such will be done by formal written agreement between you and Saddle Rock Legal Group LLC., or referring co-counsel, if applicable.
+    </td>
+  </tr>
+</table>
+`;
 
     document.getElementById('signature-output').innerHTML = signatureTemplate;
     document.querySelector('button[onclick="copySignature()"]').style.display = 'inline-block';
@@ -773,6 +777,17 @@ phoneInputs.forEach(input => {
         validatePhoneNumber(this);
     });
 });
+
+const titleInput = document.getElementById('title');
+if (titleInput) {
+    titleInput.addEventListener('input', function() {
+        this.value = capitalizeWords(this.value);
+    });
+
+    titleInput.addEventListener('blur', function() {
+        this.value = capitalizeWords(this.value);
+    });
+}
 
 // Initialize the page in regular mode
 switchMode('regular');
