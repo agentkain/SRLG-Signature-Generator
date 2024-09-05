@@ -145,10 +145,9 @@
     </div>
     <div class="container">
         <h1>Email Signature Generator</h1>
-        <!-- Add buttons for mode selection -->
-        <div>
-            <button onclick="switchMode('regular')">Regular</button>
-            <button onclick="switchMode('intake')">Intake</button>
+        <div class="mode-buttons">
+            <button id="regularMode" onclick="switchMode('regular')" class="active">Regular</button>
+            <button id="intakeMode" onclick="switchMode('intake')">Intake</button>
         </div>
         <form id="signature-form">
             <div class="form-group">
@@ -159,23 +158,23 @@
                 <label for="email">Email: <span class="required">*</span></label>
                 <input type="email" id="email" required>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="titleGroup">
                 <label for="title">Title: <span class="optional-field">(optional)</span></label>
                 <input type="text" id="title">
             </div>
-            <div class="form-group">
+            <div class="form-group" id="pronounsGroup">
                 <label for="pronouns">Pronouns: <span class="optional-field">(optional)</span></label>
                 <input type="text" id="pronouns">
             </div>
-            <div class="form-group">
+            <div class="form-group" id="phoneGroup">
                 <label for="phone">Phone: <span class="optional-field">(optional)</span></label>
                 <input type="tel" id="phone">
             </div>
-            <div class="form-group">
+            <div class="form-group" id="extensionGroup">
                 <label for="extension">Extension: <span class="optional-field">(optional)</span></label>
                 <input type="text" id="extension">
             </div>
-            <div class="form-group">
+            <div class="form-group" id="mobileGroup">
                 <label for="mobile">Mobile: <span class="optional-field">(optional)</span></label>
                 <input type="tel" id="mobile">
             </div>
@@ -186,202 +185,217 @@
     </div>
 
     <script>
-        function generateSignature() {
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const pronouns = document.getElementById('pronouns').value.trim();
-            const title = document.getElementById('title').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const extension = document.getElementById('extension').value.trim();
-            const mobile = document.getElementById('mobile').value.trim();
+let currentMode = 'regular';
 
-            // Check if name and email are provided
-            if (!name || !email) {
-                alert("Please enter both name and email address. These fields are required.");
-                return; // Exit the function if validation fails
-            }
-            // Define the current mode
-            let currentMode = 'regular';
+function switchMode(mode) {
+    if (currentMode === mode) return; // Don't do anything if the mode hasn't changed
 
-            // Function to switch between regular and intake modes
-            function switchMode(mode) {
-                currentMode = mode;
-                document.getElementById('regularMode').classList.toggle('active', mode === 'regular');
-                document.getElementById('intakeMode').classList.toggle('active', mode === 'intake');
-                
-                const regularFields = document.querySelectorAll('.form-group');
-                regularFields.forEach(field => {
-                    field.style.display = mode === 'regular' ? 'block' : 'none';
-                });
+    currentMode = mode;
+    document.getElementById('regularMode').classList.toggle('active', mode === 'regular');
+    document.getElementById('intakeMode').classList.toggle('active', mode === 'intake');
 
-                // Show only name and email fields in intake mode
-                document.getElementById('name').parentElement.style.display = 'block';
-                document.getElementById('email').parentElement.style.display = 'block';
+    const regularFields = document.querySelectorAll('.form-group');
+    regularFields.forEach(field => {
+        field.style.display = mode === 'regular' ? 'block' : 'none';
+    });
 
-                if (mode === 'intake') {
-                    document.getElementById('email').value = 'intake@saddlerocklegal.com';
-                    document.getElementById('title').value = 'Intake Specialist';
-                    document.getElementById('phone').value = '(888) 686-6454';
-                    document.getElementById('title').parentElement.style.display = 'none';
-                    document.getElementById('phone').parentElement.style.display = 'none';
-                    document.getElementById('extension').parentElement.style.display = 'none';
-                    document.getElementById('mobile').parentElement.style.display = 'none';
-                } else {
-                    document.getElementById('email').value = '';
-                    document.getElementById('title').value = '';
-                    document.getElementById('phone').value = '';
-                    document.getElementById('extension').value = '';
-                    document.getElementById('mobile').value = '';
-                }
-            }
+    // Show only name field in intake mode
+    document.getElementById('name').parentElement.style.display = 'block';
 
-            // Helper function to format phone numbers
-            function formatPhoneNumber(phoneNumberString) {
-                const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
-                const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-                if (match) {
-                    return '(' + match[1] + ') ' + match[2] + '-' + match[3];
-                }
-                return phoneNumberString;
-            }
+    // Clear all input fields
+    document.getElementById('name').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('title').value = '';
+    document.getElementById('pronouns').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('extension').value = '';
+    document.getElementById('mobile').value = '';
 
-            const formattedPhone = formatPhoneNumber(phone);
-            const formattedMobile = formatPhoneNumber(mobile);
+    if (mode === 'intake') {
+        document.getElementById('email').value = 'intake@saddlerocklegal.com';
+        document.getElementById('title').value = 'Intake Specialist';
+        document.getElementById('phone').value = '(888) 686-6454';
+        document.getElementById('email').readOnly = true;
+    } else {
+        document.getElementById('email').readOnly = false;
+        document.getElementById('emailGroup').style.display = 'block';
+    }
 
-            // Determine if all elements are present (regardless of pronouns and extension)
-            const allElementsPresent = title && phone && mobile && email;
-            
-            // New condition: Name, Title, Either phone or mobile, email
-            const mostElementsPresent = title && (phone || mobile) && email;
+    // Clear the generated signature
+    clearSignature();
+}
 
-            // Determine the padding based on the conditions
-            let tablePadding;
-            if (allElementsPresent) {
-                tablePadding = '0'; // All elements present
-            } else if (mostElementsPresent) {
-                tablePadding = '5px'; // New condition: Name, Title, Either phone or mobile, email and website
-            } else if (!title && (phone || mobile) && email) {
-                tablePadding = '10px'; // Just phone (either type), email, and website, no title
-            } else if (!title && !phone && !mobile) {
-                tablePadding = '20px'; // Just name, email, and website
-            } else {
-                tablePadding = '10px'; // Other cases
-            }
+function clearSignature() {
+    document.getElementById('signature-output').innerHTML = '';
+    document.querySelector('button[onclick="copySignature()"]').style.display = 'none';
+}
 
-            // Determine padding for mobile, email, and website
-            let phonePadding = '0px';
-            let mobilePadding = '0px';
-            let emailPadding, websitePadding;
+function generateSignature() {
+    const name = document.getElementById('name').value.trim();
+    const email = currentMode === 'intake' ? 'intake@saddlerocklegal.com' : document.getElementById('email').value.trim();
+    const pronouns = currentMode === 'regular' ? document.getElementById('pronouns').value.trim() : '';
+    const title = currentMode === 'intake' ? 'Intake Specialist' : document.getElementById('title').value.trim();
+    const phone = currentMode === 'intake' ? '(888) 686-6454' : document.getElementById('phone').value.trim();
+    const extension = currentMode === 'regular' ? document.getElementById('extension').value.trim() : '';
+    const mobile = currentMode === 'regular' ? document.getElementById('mobile').value.trim() : '';
 
-            if (allElementsPresent) {
-                phonePadding = '5px';
-                mobilePadding = '10px';
-                emailPadding = '15px';
-                websitePadding = '20px';
-            } else if (!title && phone && mobile) {
-                mobilePadding = '5px';
-                emailPadding = '10px';
-                websitePadding = '15px';
-            } else if (title && (phone || mobile)) {
-                phonePadding = '5px';
-                mobilePadding = '5px';
-                emailPadding = '10px';
-                websitePadding = '15px';
-            } else if (!title && !phone && !mobile) {
-                emailPadding = '1px';
-                websitePadding = '5px';
-            } else {
-                emailPadding = '5px';
-                websitePadding = '10px';
-            }
+    // Check if name is provided
+    if (!name) {
+        alert("Please enter a name. This field is required.");
+        return;
+    }
 
-            const signatureTemplate = `
-            <table border="0" cellspacing="0" cellpadding="0" width="100%" style="max-width: 500px;" class="signature-table">
-              <tr>
-                <td style="padding: 0;">
-                  <table border="0" cellspacing="0" cellpadding="0" width="100%">
-                    <tr>
-                      <td width="${allElementsPresent ? '190' : '180'}" class="logo-cell" valign="top" style="padding-right: 0;">
-                        <div style="display: flex; align-items: flex-start;">
-                          <a href="https://www.saddlerocklegal.com/" target="_blank">
-                            <img src="https://i.imgur.com/zZGyoQQ.png" width="${allElementsPresent ? '190' : '180'}" style="width:${allElementsPresent ? '190px' : '180px'}; ${allElementsPresent ? 'height:110px;' : 'max-width:100%; height:auto;'} border:none;" alt="Saddle Rock Legal Logo" id="logo-img" />
-                          </a>
-                        </div>
-                      </td>
-                      <td class="content-cell" valign="top" style="padding-left: 0;">
-                        <table border="0" cellspacing="0" cellpadding="0" width="100%" id="content-table" style="padding-top: ${tablePadding};">
-                          <tr>
-                            <td style="font-family:Arial, sans-serif; font-size:12pt; font-weight:bold; padding-bottom:1px; line-height:1.2;">
-                              ${name}${pronouns ? ` <span style="font-weight:normal; font-size:10pt;">(${pronouns})</span>` : ''}
-                            </td>
-                          </tr>
-                          ${title ? `<tr><td style="font-family:Arial, sans-serif; font-size:10pt; font-style:italic; padding-bottom:3px; line-height:1.2;">${title}</td></tr>` : ''}
-                          <tr>
-                            <td class="contact-info" style="font-family:Arial, sans-serif; font-size:10pt; line-height:1.3;">
-                              ${phone ? `<div style="padding-left:${phonePadding};"><img src="https://i.imgur.com/FlCMsqL.png" width="11" height="11" style="vertical-align:middle; margin-right:5px;" alt="Phone" />${formattedPhone}${extension ? ' EXT. ' + extension : ''}</div>` : ''}
-                              ${mobile ? `<div style="padding-left:${mobilePadding};"><img src="https://i.imgur.com/fmRyFcr.png" width="9" height="11" style="vertical-align:middle; margin-right:5px;" alt="Mobile" />${formattedMobile}</div>` : ''}
-                              <div style="padding-left:${emailPadding};"><img src="https://i.imgur.com/Lq3De8u.png" width="13" height="10" style="vertical-align:middle; margin-right:5px;" alt="Email" /><a href="mailto:${email}" style="color:#b29649; text-decoration:none;">${email}</a></div>
-                              <div style="padding-left:${websitePadding};"><img src="https://i.imgur.com/FSfP548.png" width="11" height="11" style="vertical-align:middle; margin-right:5px;" alt="Website" /><a href="https://www.saddlerocklegal.com/" target="_blank" style="color:#b29649; text-decoration:none;">www.saddlerocklegal.com</a></div>
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td style="font-family:Arial, sans-serif; font-size:7.5pt; line-height:1.2; color:#666666; padding-top:5px;">
-                  This message is intended only for the use of the Addressee and may contain information that is PRIVILEGED and CONFIDENTIAL. If you are not the intended recipient, you are hereby notified that any dissemination of this communication is strictly prohibited. If you have received this email in error, please erase all copies of the message and its attachments and notify us immediately. Your receipt of this email in no way creates an attorney-client privilege as such will be done by formal written agreement between you and Saddle Rock Legal Group LLC., or referring co-counsel, if applicable.
-                </td>
-              </tr>
-            </table>
-            `;
-
-            document.getElementById('signature-output').innerHTML = signatureTemplate;
+    // Helper function to format phone numbers
+    function formatPhoneNumber(phoneNumberString) {
+        const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+        if (match) {
+            return '(' + match[1] + ') ' + match[2] + '-' + match[3];
         }
+        return phoneNumberString;
+    }
 
-        function copySignature() {
-            const signatureOutput = document.getElementById('signature-output');
-            
-            // Create a temporary element to hold the signature content
-            const tempElement = document.createElement('div');
-            tempElement.innerHTML = signatureOutput.innerHTML;
-            
-            // Remove the "Email Signature" hidden text
-            const hiddenText = tempElement.querySelector('div[style*="display:none"]');
-            if (hiddenText) hiddenText.remove();
-            
-            // Get only the main signature table
-            const signatureTable = tempElement.querySelector('.signature-table');
-            
-            // Create a new temporary element with just the signature table
-            const finalElement = document.createElement('div');
-            if (signatureTable) {
-                // Remove background color from all elements within the table
-                signatureTable.style.backgroundColor = 'transparent';
-                signatureTable.querySelectorAll('*').forEach(el => {
-                    el.style.backgroundColor = 'transparent';
-                });
-                finalElement.appendChild(signatureTable.cloneNode(true));
-            }
-            
-            // Temporarily append the finalElement to the body
-            document.body.appendChild(finalElement);
-            
-            // Copy the content to the clipboard
-            const range = document.createRange();
-            range.selectNode(finalElement);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            
-            // Remove the temporary element from the body
-            document.body.removeChild(finalElement);
-            
-            alert('Signature copied to clipboard!');
-        }
+    const formattedPhone = formatPhoneNumber(phone);
+    const formattedMobile = formatPhoneNumber(mobile);
+
+    // Determine if all elements are present
+    const allElementsPresent = title && phone && mobile && email;
+    
+    // New condition: Name, Title, Either phone or mobile, email
+    const mostElementsPresent = title && (phone || mobile) && email;
+
+    // Determine the padding based on the conditions
+    let tablePadding;
+    if (allElementsPresent) {
+        tablePadding = '0';
+    } else if (mostElementsPresent) {
+        tablePadding = '5px';
+    } else if (!title && (phone || mobile) && email) {
+        tablePadding = '10px';
+    } else if (!title && !phone && !mobile) {
+        tablePadding = '20px';
+    } else {
+        tablePadding = '10px';
+    }
+
+    // Determine padding for mobile, email, and website
+    let phonePadding = '0px';
+    let mobilePadding = '0px';
+    let emailPadding, websitePadding;
+
+    if (allElementsPresent) {
+        phonePadding = '5px';
+        mobilePadding = '10px';
+        emailPadding = '15px';
+        websitePadding = '20px';
+    } else if (!title && phone && mobile) {
+        mobilePadding = '5px';
+        emailPadding = '10px';
+        websitePadding = '15px';
+    } else if (title && (phone || mobile)) {
+        phonePadding = '5px';
+        mobilePadding = '5px';
+        emailPadding = '10px';
+        websitePadding = '15px';
+    } else if (!title && !phone && !mobile) {
+        emailPadding = '1px';
+        websitePadding = '5px';
+    } else {
+        emailPadding = '5px';
+        websitePadding = '10px';
+    }
+
+    const signatureTemplate = `
+    <table border="0" cellspacing="0" cellpadding="0" width="100%" style="max-width: 500px;" class="signature-table">
+      <tr>
+        <td style="padding: 0;">
+          <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+              <td width="${allElementsPresent ? '190' : '180'}" class="logo-cell" valign="top" style="padding-right: 0;">
+                <div style="display: flex; align-items: flex-start;">
+                  <a href="https://www.saddlerocklegal.com/" target="_blank">
+                    <img src="https://i.imgur.com/zZGyoQQ.png" width="${allElementsPresent ? '190' : '180'}" style="width:${allElementsPresent ? '190px' : '180px'}; ${allElementsPresent ? 'height:110px;' : 'max-width:100%; height:auto;'} border:none;" alt="Saddle Rock Legal Logo" id="logo-img" />
+                  </a>
+                </div>
+              </td>
+              <td class="content-cell" valign="top" style="padding-left: 0;">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%" id="content-table" style="padding-top: ${tablePadding};">
+                  <tr>
+                    <td style="font-family:Arial, sans-serif; font-size:12pt; font-weight:bold; padding-bottom:1px; line-height:1.2;">
+                      ${name}${pronouns ? ` <span style="font-weight:normal; font-size:10pt;">(${pronouns})</span>` : ''}
+                    </td>
+                  </tr>
+                  ${title ? `<tr><td style="font-family:Arial, sans-serif; font-size:10pt; font-style:italic; padding-bottom:3px; line-height:1.2;">${title}</td></tr>` : ''}
+                  <tr>
+                    <td class="contact-info" style="font-family:Arial, sans-serif; font-size:10pt; line-height:1.3;">
+                      ${phone ? `<div style="padding-left:${phonePadding};"><img src="https://i.imgur.com/FlCMsqL.png" width="11" height="11" style="vertical-align:middle; margin-right:5px;" alt="Phone" />${formattedPhone}${extension ? ' EXT. ' + extension : ''}</div>` : ''}
+                      ${mobile ? `<div style="padding-left:${mobilePadding};"><img src="https://i.imgur.com/fmRyFcr.png" width="9" height="11" style="vertical-align:middle; margin-right:5px;" alt="Mobile" />${formattedMobile}</div>` : ''}
+                      <div style="padding-left:${emailPadding};"><img src="https://i.imgur.com/Lq3De8u.png" width="13" height="10" style="vertical-align:middle; margin-right:5px;" alt="Email" /><a href="mailto:${email}" style="color:#b29649; text-decoration:none;">${email}</a></div>
+                      <div style="padding-left:${websitePadding};"><img src="https://i.imgur.com/FSfP548.png" width="11" height="11" style="vertical-align:middle; margin-right:5px;" alt="Website" /><a href="https://www.saddlerocklegal.com/" target="_blank" style="color:#b29649; text-decoration:none;">www.saddlerocklegal.com</a></div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-family:Arial, sans-serif; font-size:7.5pt; line-height:1.2; color:#666666; padding-top:5px;">
+          This message is intended only for the use of the Addressee and may contain information that is PRIVILEGED and CONFIDENTIAL. If you are not the intended recipient, you are hereby notified that any dissemination of this communication is strictly prohibited. If you have received this email in error, please erase all copies of the message and its attachments and notify us immediately. Your receipt of this email in no way creates an attorney-client privilege as such will be done by formal written agreement between you and Saddle Rock Legal Group LLC., or referring co-counsel, if applicable.
+        </td>
+      </tr>
+    </table>
+    `;
+
+    document.getElementById('signature-output').innerHTML = signatureTemplate;
+    document.querySelector('button[onclick="copySignature()"]').style.display = 'inline-block';
+}
+
+function copySignature() {
+    const signatureOutput = document.getElementById('signature-output');
+    
+    // Create a temporary element to hold the signature content
+    const tempElement = document.createElement('div');
+    tempElement.innerHTML = signatureOutput.innerHTML;
+    
+    // Remove the "Email Signature" hidden text
+    const hiddenText = tempElement.querySelector('div[style*="display:none"]');
+    if (hiddenText) hiddenText.remove();
+    
+    // Get only the main signature table
+    const signatureTable = tempElement.querySelector('.signature-table');
+    
+    // Create a new temporary element with just the signature table
+    const finalElement = document.createElement('div');
+    if (signatureTable) {
+        // Remove background color from all elements within the table
+        signatureTable.style.backgroundColor = 'transparent';
+        signatureTable.querySelectorAll('*').forEach(el => {
+            el.style.backgroundColor = 'transparent';
+        });
+        finalElement.appendChild(signatureTable.cloneNode(true));
+    }
+    
+    // Temporarily append the finalElement to the body
+    document.body.appendChild(finalElement);
+    
+    // Copy the content to the clipboard
+    const range = document.createRange();
+    range.selectNode(finalElement);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    
+    // Remove the temporary element from the body
+    document.body.removeChild(finalElement);
+    
+    alert('Signature copied to clipboard!');
+}
+
+// Initialize the page in regular mode
+switchMode('regular');
     </script>
 </body>
 </html>
