@@ -145,6 +145,11 @@
     </div>
     <div class="container">
         <h1>Email Signature Generator</h1>
+        <!-- Add buttons for mode selection -->
+        <div>
+            <button onclick="switchMode('regular')">Regular</button>
+            <button onclick="switchMode('intake')">Intake</button>
+        </div>
         <form id="signature-form">
             <div class="form-group">
                 <label for="name">Name: <span class="required">*</span></label>
@@ -194,6 +199,40 @@
             if (!name || !email) {
                 alert("Please enter both name and email address. These fields are required.");
                 return; // Exit the function if validation fails
+            }
+            // Define the current mode
+            let currentMode = 'regular';
+
+            // Function to switch between regular and intake modes
+            function switchMode(mode) {
+                currentMode = mode;
+                document.getElementById('regularMode').classList.toggle('active', mode === 'regular');
+                document.getElementById('intakeMode').classList.toggle('active', mode === 'intake');
+                
+                const regularFields = document.querySelectorAll('.form-group');
+                regularFields.forEach(field => {
+                    field.style.display = mode === 'regular' ? 'block' : 'none';
+                });
+
+                // Show only name and email fields in intake mode
+                document.getElementById('name').parentElement.style.display = 'block';
+                document.getElementById('email').parentElement.style.display = 'block';
+
+                if (mode === 'intake') {
+                    document.getElementById('email').value = 'intake@saddlerocklegal.com';
+                    document.getElementById('title').value = 'Intake Specialist';
+                    document.getElementById('phone').value = '(888) 686-6454';
+                    document.getElementById('title').parentElement.style.display = 'none';
+                    document.getElementById('phone').parentElement.style.display = 'none';
+                    document.getElementById('extension').parentElement.style.display = 'none';
+                    document.getElementById('mobile').parentElement.style.display = 'none';
+                } else {
+                    document.getElementById('email').value = '';
+                    document.getElementById('title').value = '';
+                    document.getElementById('phone').value = '';
+                    document.getElementById('extension').value = '';
+                    document.getElementById('mobile').value = '';
+                }
             }
 
             // Helper function to format phone numbers
