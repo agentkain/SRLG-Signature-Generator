@@ -324,16 +324,21 @@
             // Determine top padding to vertically center against logo
             const totalLines = 1 + (title ? 1 : 0) + contactLines.length;
             let tablePadding;
-            if (totalLines >= 6) {
+            let contentValign;
+
+            if (totalLines <= 3) {
+                // Few lines — vertically center against logo, no extra padding needed
+                contentValign = 'middle';
                 tablePadding = '0';
-            } else if (totalLines === 5) {
-                tablePadding = '5px';
             } else if (totalLines === 4) {
+                contentValign = 'top';
                 tablePadding = '10px';
-            } else if (totalLines === 3) {
-                tablePadding = '15px';
+            } else if (totalLines === 5) {
+                contentValign = 'top';
+                tablePadding = '5px';
             } else {
-                tablePadding = '20px';
+                contentValign = 'top';
+                tablePadding = '0';
             }
 
             // Choose logo size: larger when all fields present for tighter fit
@@ -351,7 +356,7 @@
                           <img src="https://i.imgur.com/zZGyoQQ.png" width="${logoWidth}" alt="Saddle Rock Legal Logo" style="display:block; width:${logoWidth}px; max-width:${logoWidth}px; height:auto; border:0; outline:none; -ms-interpolation-mode:bicubic;" />
                         </a>
                       </td>
-                      <td valign="top" style="padding:0; margin:0; vertical-align:top;" class="content-cell">
+                      <td valign="${contentValign}" style="padding:0; margin:0; vertical-align:${contentValign};" class="content-cell">
                         <table border="0" cellspacing="0" cellpadding="0" style="width:100%; border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; padding-top:${tablePadding};">
                           <tr>
                             <td style="font-family:Arial, sans-serif; font-size:12pt; font-weight:bold; color:#000000; padding:0 0 1px 0; margin:0; line-height:1.2;">
